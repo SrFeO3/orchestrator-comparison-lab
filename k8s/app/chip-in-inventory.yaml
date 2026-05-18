@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-config
+data:
+  config.yaml: |
+    # chip-in-inventory configuration
+    # This is a placeholder configuration.
+    # Add specific node and service inventory details here.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spn-inventory
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spn-inventory
+  template:
+    metadata:
+      labels:
+        app: spn-inventory
+    spec:
+      containers:
+      # --- Task: etcd (Sidecar) ---
+      - name: etcd
+        image: quay.io/coreos/etcd:v3.5.14
+        command: ["etcd"]
+        args:
+          - "--listen-client-urls=http://0.0.0.0:2379"
+          - "--advertise-client-urls=http://127.0.0.1:2379"
+          - "--data-dir=/etcd-data"
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        volumeMounts:
+          - name: etcd-data
+            mountPath: /etcd-data
+
+      # --- Task: inventory (API & Web UI) ---
+      - name: inventory
+        image: ghcr.io/srfeo3/chip-in-inventory:latest
+        env:
+          - name: ETCD_ENDPOINTS
+            value: "http://127.0.0.1:2379"
+          - name: CONFIG_FILE
+            value: "/etc/inventory/config.yaml"
+          - name: RUST_LOG
+            value: "info"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        ports:
+          - name: inv-http
+            containerPort: 3000
+          - name: hub-udp
+            containerPort: 5000
+            protocol: UDP
+          - name: gw-https
+            containerPort: 7443
+          - name: gw-http
+            containerPort: 7080
+        volumeMounts:
+          - name: config-file
+            mountPath: /etc/inventory/config.yaml
+            subPath: config.yaml
+
+      volumes:
+        - name: etcd-data
+          emptyDir: {}
+        - name: config-file
+          configMap:
+            name: inventory-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spn-inventory-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: spn-inventory
+  ports:
+    - name: inventory-http
+      port: 3000
+      targetPort: 3000
+      # API and Web UI are accessible on this port
+    - name: hub-udp
+      port: 5000
+      targetPort: 5000
+      protocol: UDP
+    - name: spngw-https
+      port: 8443
+      targetPort: 7443
+    - name: spngw-http
+      port: 8080
+      targetPort: 7080
