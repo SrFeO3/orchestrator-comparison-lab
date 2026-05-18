@@ -1,13 +1,4 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: inventory-config
-data:
-  config.yaml: |
-    # chip-in-inventory configuration
     # This is a placeholder configuration.
-    # Add specific node and service inventory details here.
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -72,8 +63,8 @@ spec:
         - name: etcd-data
           emptyDir: {}
         - name: config-file
-          configMap:
-            name: inventory-config
+          secret:
+            secretName: inventory-secret
 ---
 apiVersion: v1
 kind: Service
