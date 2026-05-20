@@ -16,8 +16,8 @@ data:
     }
 
     API_BASE_URL="http://spn-inventory-service:3000/v1"
-    REALM_NAME="quench"
-    ZONE_NAME="test.v2.chip-in.net"
+    REALM_NAME="ironsand"
+    ZONE_NAME="ironsand.v2.chip-in.net"
 
     echo "Waiting for Inventory Service API..."
     until curl -s "$API_BASE_URL/realms" > /dev/null; do
