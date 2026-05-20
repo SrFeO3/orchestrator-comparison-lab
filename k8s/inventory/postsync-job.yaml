@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inventory-setup-script
+data:
+  setup.sh: |
+    #!/bin/sh
+    set -e
+
+    # Function to check resource existence
+    exists() {
+      path=$1
+      name=$2
+      # Check if specified name exists in the API response list
+      curl -s "$API_BASE_URL/$path" | jq -e ".[] | select(.name == \"$name\")" > /dev/null
+    }
+
+    API_BASE_URL="http://spn-inventory-service:3000/v1"
+    REALM_NAME="quench"
+    ZONE_NAME="test.v2.chip-in.net"
+
+    echo "Waiting for Inventory Service API..."
+    until curl -s "$API_BASE_URL/realms" > /dev/null; do
+      sleep 5
+    done
+
+    # Execute build_realm.sh logic
+    CACERT="-----BEGIN CERTIFICATE-----
+MIIDmTCCAoGgAwIBAgIUQFlH+y76TW4GCwvGWEESfT4sTZAwDQYJKoZIhvcNAQEL
+... (omitted) ...
+M7eKGakIiHjPZDWOEg==
+-----END CERTIFICATE-----"
+
+    VERIFY_KEY="-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA96yON3DXHHS7DMfe4h1W
+... (omitted) ...
+ywIDAQAB
+-----END PUBLIC KEY-----"
+
+    SIGN_KEY="-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQD3rI43cNccdLsM
+... (omitted) ...
+0kaUPHgv1Qgvn5SYcebU+AQ4
+-----END PRIVATE KEY-----"
+
+    if ! exists "realms" "$REALM_NAME"; then
+      echo "Step 1: Creating Realm..."
+      jq -n --arg name "$REALM_NAME" --arg ca "$CACERT" --arg vk "$VERIFY_KEY" --arg sk "$SIGN_KEY" \
+        '{name: $name, title: "Quench Shop System", description: "Created via PostSync Job", cacert: $ca, deviceIdVerificationKey: $vk, deviceIdSigningKey: $sk, sessionTimeout: 2592000, disabled: false}' \
+        | curl -s -X POST "$API_BASE_URL/realms" -H "Content-Type: application/json" -d @-
+    else
+      echo "Step 1: Realm '$REALM_NAME' already exists. Skipping."
+    fi
+
+    if ! exists "realms/$REALM_NAME/zones" "$ZONE_NAME"; then
+      echo "Step 2: Creating Zone..."
+      jq -n --arg name "$ZONE_NAME" \
+        '{name: $name, title: ("Shop zone " + $name), description: "DNS zone configuration"}' \
+        | curl -s -X POST "$API_BASE_URL/realms/$REALM_NAME/zones" -H "Content-Type: application/json" -d @-
+    else
+      echo "Step 2: Zone '$ZONE_NAME' already exists. Skipping."
+    fi
+
+    SUBS="www auth api check sirius betelgeuse procyon"
+    for sub in $SUBS; do
+        if ! exists "realms/$REALM_NAME/zones/$ZONE_NAME/subdomains" "$sub"; then
+          echo "Step 3: Creating Subdomain '$sub'..."
+          jq -n --arg name "$sub" \
+            '{name: $name, title: $name, description: ("Subdomain for " + $name)}' \
+            | curl -s -X POST "$API_BASE_URL/realms/$REALM_NAME/zones/$ZONE_NAME/subdomains" -H "Content-Type: application/json" -d @-
+        fi
+        
+        if ! exists "realms/$REALM_NAME/virtual-hosts" "$sub"; then
+          echo "Step 3: Creating VirtualHost for '$sub'..."
+          jq -n --arg name "$sub" --arg r "$REALM_NAME" --arg z "$ZONE_NAME" \
+            '{name: $name, title: $name, subdomain: ("urn:chip-in:subdomain:" + $r + ":" + $z + ":" + $name)}' \
+            | curl -s -X POST "$API_BASE_URL/realms/$REALM_NAME/virtual-hosts" -H "Content-Type: application/json" -d @-
+        fi
+    done
+
+    if ! exists "realms/$REALM_NAME/routing-chains" "fruit-shop-route"; then
+      echo "Step 4: Creating RoutingChain..."
+      jq -n --arg dom "$ZONE_NAME" \
+        '{name: "fruit-shop-route", title: "Quench Routing Chain", rules: [
+          {match: ("hostname.equals(\"www." + $dom + "\")"), action: {type: "proxy", upstream: "http://127.0.0.1:9000"}},
+          {match: ("hostname.equals(\"auth." + $dom + "\")"), action: {type: "proxy", upstream: "http://127.0.0.1:9001"}},
+          {match: "request.path.starts_with(\"/api/\")", action: {type: "proxy", upstream: "http://127.0.0.1:9002", authScopeName: "shop_scope"}}
+        ]}' | curl -s -X POST "$API_BASE_URL/realms/$REALM_NAME/routing-chains" -H "Content-Type: application/json" -d @-
+    fi
+
+    if ! exists "realms/$REALM_NAME/hubs" "hub1"; then
+      echo "Step 5: Creating Hub..."
+      jq -n --arg n "hub1" --arg f "hub1.$ZONE_NAME" \
+        '{name: $n, title: "Quench Hub", fqdn: $f, serverAddress: "0.0.0.0", serverPort: 4433, serverCert: "dummy-cert", serverCertKey: "dummy-key", attributes: {}}' \
+        | curl -s -X POST "$API_BASE_URL/realms/$REALM_NAME/hubs" -H "Content-Type: application/json" -d @-
+    fi
+
+    SVCS="www api auth database"
+    for svc in $SVCS; do
+        if ! exists "realms/$REALM_NAME/hubs/hub1/services" "$svc"; then
+          echo "Step 6: Creating Service '$svc'..."
+          jq -n --arg n "$svc" --arg z "$ZONE_NAME" \
+            '{name: $n, title: ($n + " service"), provider: ("urn:chip-in:end-point:" + $z + ":" + $n + "-server"), consumers: [("urn:chip-in:end-point:" + $z + ":" + $n + "-gateway")]}' \
+            | curl -s -X POST "$API_BASE_URL/realms/$REALM_NAME/hubs/hub1/services" -H "Content-Type: application/json" -d @-
+        fi
+    done
+    echo "Data population complete."
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: inventory-setup-job-
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded,BeforeHookCreation
+spec:
+  template:
+    spec:
+      containers:
+      - name: setup-executor
+        image: badouralix/curl-jq:latest
+        command: ["/bin/sh", "/scripts/setup.sh"]
+        volumeMounts:
+        - name: script-vol
+          mountPath: /scripts
+      restartPolicy: Never
+      volumes:
+      - name: script-vol
+        configMap:
+          name: inventory-setup-script

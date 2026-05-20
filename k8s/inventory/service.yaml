@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spn-inventory-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: spn-inventory
+  ports:
+    - name: inventory-http
+      port: 3000
+      targetPort: 3000
+      # API and Web UI are accessible on this port
+    - name: hub-udp
+      port: 5000
+      targetPort: 5000
+      protocol: UDP
+    - name: spngw-https
+      port: 8443
+      targetPort: 7443
+    - name: spngw-http
+      port: 8080
+      targetPort: 7080
