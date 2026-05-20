@@ -26,22 +26,22 @@ data:
 
     # Execute build_realm.sh logic
     CACERT="-----BEGIN CERTIFICATE-----
-MIIDmTCCAoGgAwIBAgIUQFlH+y76TW4GCwvGWEESfT4sTZAwDQYJKoZIhvcNAQEL
-... (omitted) ...
-M7eKGakIiHjPZDWOEg==
------END CERTIFICATE-----"
+    MIIDmTCCAoGgAwIBAgIUQFlH+y76TW4GCwvGWEESfT4sTZAwDQYJKoZIhvcNAQEL
+    ... (omitted) ...
+    M7eKGakIiHjPZDWOEg==
+    -----END CERTIFICATE-----"
 
     VERIFY_KEY="-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA96yON3DXHHS7DMfe4h1W
-... (omitted) ...
-ywIDAQAB
------END PUBLIC KEY-----"
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA96yON3DXHHS7DMfe4h1W
+    ... (omitted) ...
+    ywIDAQAB
+    -----END PUBLIC KEY-----"
 
     SIGN_KEY="-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQD3rI43cNccdLsM
-... (omitted) ...
-0kaUPHgv1Qgvn5SYcebU+AQ4
------END PRIVATE KEY-----"
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQD3rI43cNccdLsM
+    ... (omitted) ...
+    0kaUPHgv1Qgvn5SYcebU+AQ4
+    -----END PRIVATE KEY-----"
 
     if ! exists "realms" "$REALM_NAME"; then
       echo "Step 1: Creating Realm..."
