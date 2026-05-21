@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: spngw
-        image: ghcr.io/srfeo3/spngateway:latest
+        image: ghcr.io/srfeo3/spngw:latest
         ports:
         - name: gw-http
           containerPort: 7080
