@@ -1,3 +1,6 @@
+# SPN Inventory Deployment
+# External Resource Requirements:
+# 1. Secret [inventory-secret]: Contains config.yaml -> /etc/inventory/config.yaml.
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,15 +1,17 @@
-# ArgoCD Application for SPN Inventory Service
+# ArgoCD Application for SPN Hub Service
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: chip-in-inventory
+  name: spn-hub
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:
     repoURL: https://github.com/SrFeO3/orchestrator-comparison-lab.git
     targetRevision: HEAD
-    path: k8s/inventory
+    path: k8s/spnhub
   destination:
     server: https://kubernetes.default.svc
     namespace: default

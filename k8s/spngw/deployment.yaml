@@ -1,0 +1,99 @@
+# SPN Gateway Deployment
+# External Resource Requirements:
+# 1. ConfigMap [spngw-consumer-config]: 
+#    - 00-default.conf (Supervisor conf) -> /etc/supervisor/conf.d/
+#    - private-ca.crt (Trusted CA)        -> /etc/ssl/workers/ca-certificates/
+# 2. ConfigMap [spngw-config]:
+#    - pinconfig.yaml -> /app/conf/
+# 3. Secret [spngw-consumer-certs]: 
+#    - worker-a.crt, worker-a.key (Auth) -> /etc/ssl/workers/client-certs/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spn-gw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spn-gw
+  template:
+    metadata:
+      labels:
+        app: spn-gw
+    spec:
+      containers:
+      - name: spngw
+        image: ghcr.io/srfeo3/spngateway:latest
+        ports:
+        - name: gw-http
+          containerPort: 7080
+        - name: gw-https
+          containerPort: 7443
+        env:
+        - name: APIGW_INVENTORY_URL
+          value: "http://spn-inventory-service:3000/v1"
+        - name: APIGW_TLS_BIND_ADDRESS
+          value: "0.0.0.0:7443"
+        - name: APIGW_HTTP_BIND_ADDRESS
+          value: "0.0.0.0:7080"
+        - name: APIGW_TLS_REDIRECT_PORT
+          value: "443"
+        - name: APIGW_PINGORA_CONF
+          value: "/app/conf/pinconfig.yaml"
+        - name: RUST_LOG
+          value: "info"
+        volumeMounts:
+        - name: gw-config
+          mountPath: /app/conf/pinconfig.yaml
+          subPath: pinconfig.yaml
+      - name: multi-consumer
+        image: ghcr.io/srfeo3/spnagent/multi-consumer:latest
+        env:
+        - name: RUST_LOG
+          value: "info"
+        volumeMounts:
+        - name: supervisor-conf
+          mountPath: /etc/supervisor/conf.d/
+        - name: worker-ca
+          mountPath: /etc/ssl/workers/ca-certificates/
+          subPath: private-ca.crt
+        - name: worker-certs
+          mountPath: /etc/ssl/workers/client-certs/
+      volumes:
+      - name: gw-config
+        configMap:
+          name: spngw-config
+          items:
+          - key: pinconfig.yaml
+            path: pinconfig.yaml
+      - name: supervisor-conf
+        configMap:
+          name: spngw-consumer-config
+          items:
+          - key: 00-default.conf
+            path: 00-default.conf
+      - name: worker-ca
+        configMap:
+          name: spngw-consumer-config
+          items:
+          - key: private-ca.crt
+            path: private-ca.crt
+      - name: worker-certs
+        secret:
+          secretName: spngw-consumer-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spn-gw-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: spn-gw
+  ports:
+    - name: http
+      port: 80
+      targetPort: 7080
+    - name: https
+      port: 443
+      targetPort: 7443

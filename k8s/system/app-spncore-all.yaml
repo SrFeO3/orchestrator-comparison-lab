@@ -1,0 +1,69 @@
+# ArgoCD Application Stack for SPN Inventory, Hub, and Gateway
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spn-inventory
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/SrFeO3/orchestrator-comparison-lab.git
+    targetRevision: HEAD
+    path: k8s/inventory
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spn-hub
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/SrFeO3/orchestrator-comparison-lab.git
+    targetRevision: HEAD
+    path: k8s/spnhub
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spn-gw
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/SrFeO3/orchestrator-comparison-lab.git
+    targetRevision: HEAD
+    path: k8s/spngw
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
