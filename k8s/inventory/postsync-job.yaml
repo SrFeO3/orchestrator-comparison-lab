@@ -90,7 +90,7 @@ data:
     if ! exists "realms" "$REALM_NAME"; then
       echo "Step 1: Creating Realm..."
       jq -n --arg name "$REALM_NAME" --arg ca "$CACERT" --arg vk "$VERIFY_KEY" --arg sk "$SIGN_KEY" \
-        '{name: $name, title: "Quench Shop System", description: "Created via PostSync Job", cacert: $ca, deviceIdVerificationKey: $vk, deviceIdSigningKey: $sk, sessionTimeout: 2592000, disabled: false}' \
+        '{name: $name, title: "Quench Shop System", description: "Created via PostSync Job", cacert: $ca, deviceIdVerificationKey: $vk, deviceIdSigningKey: $sk, sessionTimeout: 2592000, disabled: true}' \
         | curl -s -X POST "$API_BASE_URL/realms" -H "Content-Type: application/json" -d @-
     else
       echo "Step 1: Realm '$REALM_NAME' already exists. Skipping."
