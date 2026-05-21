@@ -56,28 +56,18 @@ spec:
           mountPath: /etc/supervisor/conf.d/
         - name: worker-ca
           mountPath: /etc/ssl/workers/ca-certificates/
-          subPath: private-ca.crt
         - name: worker-certs
           mountPath: /etc/ssl/workers/client-certs/
       volumes:
       - name: gw-config
         configMap:
           name: spngw-config
-          items:
-          - key: pinconfig.yaml
-            path: pinconfig.yaml
       - name: supervisor-conf
         configMap:
-          name: spngw-consumer-config
-          items:
-          - key: 00-default.conf
-            path: 00-default.conf
+          name: spngw-consumer-supervisor-config
       - name: worker-ca
         configMap:
-          name: spngw-consumer-config
-          items:
-          - key: private-ca.crt
-            path: private-ca.crt
+          name: spngw-consumer-trustca-config
       - name: worker-certs
         secret:
           secretName: spngw-consumer-certs
