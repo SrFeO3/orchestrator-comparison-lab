@@ -21,6 +21,10 @@ spec:
       labels:
         app: spn-gw
     spec:
+      hostAliases:
+      - ip: "10.43.0.100"
+        hostnames:
+        - "hub1.test.v2.chip-in.net"
       containers:
       - name: spngw
         image: ghcr.io/srfeo3/spngw:latest
@@ -50,7 +54,7 @@ spec:
         image: ghcr.io/srfeo3/spnagent/multi-consumer:latest
         env:
         - name: SPN_HUB_HOSTNAME
-          value: "spn-hub-service"
+          value: "hub1.test.v2.chip-in.net"
         - name: SPN_HUB_PORT
           value: "4433"
         - name: RUST_LOG
