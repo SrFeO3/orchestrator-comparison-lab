@@ -5,7 +5,7 @@ metadata:
   name: spn-inventory
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io/foreground
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
@@ -30,7 +30,7 @@ metadata:
   name: spn-hub
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io/foreground
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
@@ -55,7 +55,7 @@ metadata:
   name: spn-gw
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - resources-finalizer.argocd.argoproj.io/foreground
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 spec:
