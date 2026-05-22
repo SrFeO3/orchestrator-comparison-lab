@@ -85,7 +85,7 @@ kind: Service
 metadata:
   name: spn-gw-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: spn-gw
   ports:
@@ -95,3 +95,21 @@ spec:
     - name: https
       port: 443
       targetPort: 7443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spn-gw-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: spn-gw-service
+            port:
+              number: 80
