@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: spn-inventory
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
@@ -27,6 +29,8 @@ kind: Application
 metadata:
   name: spn-hub
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
@@ -50,6 +54,8 @@ kind: Application
 metadata:
   name: spn-gw
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 spec:

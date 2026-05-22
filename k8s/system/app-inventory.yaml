@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: chip-in-inventory
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
