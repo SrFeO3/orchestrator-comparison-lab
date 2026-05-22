@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: chip-in-inventory
+  name: spn-inventory
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
