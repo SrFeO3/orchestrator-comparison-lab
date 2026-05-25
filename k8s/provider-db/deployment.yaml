@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: provider-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: provider-db
+  template:
+    metadata:
+      labels:
+        app: provider-db
+    spec:
+      hostAliases:
+      - ip: "10.43.0.100"
+        hostnames:
+        - "hub1.test.v2.chip-in.net"
+      volumes:
+      - name: certs
+        secret:
+          secretName: provider-db-certs
+
+      containers:
+      - name: postgres
+        image: postgres:alpine
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: provider-db-config
+              key: POSTGRES_PASSWORD
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+
+      - name: spn-provider
+        image: ghcr.io/srfeo3/spnagent/provider:latest
+        env:
+        - name: SPN_HUB_HOSTNAME
+          value: "hub1.test.v2.chip-in.net"
+        - name: SPN_HUB_PORT
+          value: "4433"
+        - name: FORWARD_ADDRESS
+          value: "127.0.0.1:5432"
+        - name: SPN_AGENT_TRUST_CERTIFICATE_ROOT
+          value: "/etc/ssl/workers/ca-certificates/ca.pem"
+        - name: SPN_AGENT_CLIENT_CERTIFICATE
+          value: "/etc/ssl/workers/client-certs/client.pem"
+        - name: SPN_AGENT_CLIENT_CERTIFICATE_KEY
+          value: "/etc/ssl/workers/client-certs/client-key.pem"
+        - name: RUST_LOG
+          value: "info"
+        volumeMounts:
+        - name: certs
+          mountPath: /etc/ssl/workers/ca-certificates/ca.pem
+          subPath: ca.pem
+        - name: certs
+          mountPath: /etc/ssl/workers/client-certs/client.pem
+          subPath: client.pem
+        - name: certs
+          mountPath: /etc/ssl/workers/client-certs/client-key.pem
+          subPath: client-key.pem
+          readOnly: true
