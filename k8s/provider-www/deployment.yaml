@@ -23,7 +23,7 @@ spec:
 
       containers:
       - name: spn-www
-        image: ghcr.io/srfeo3/spn-www:latest
+        image: ghcr.io/srfeo3/spn-test-server:latest
         env:
         - name: WWW_HOST
           value: "0.0.0.0"
@@ -35,7 +35,7 @@ spec:
             memory: 128Mi
 
       - name: spn-provider
-        image: ghcr.io/srfeo3/spnagent/provider:latest
+        image: ghcr.io/chip-in-v2/spnagent/provider:latest
         env:
         - name: SPN_HUB_HOSTNAME
           value: "hub1.test.v2.chip-in.net"

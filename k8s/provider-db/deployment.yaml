@@ -36,7 +36,7 @@ spec:
             memory: 512Mi
 
       - name: spn-provider
-        image: ghcr.io/srfeo3/spnagent/provider:latest
+        image: ghcr.io/chip-in-v2/spnagent/provider:latest
         env:
         - name: SPN_HUB_HOSTNAME
           value: "hub1.test.v2.chip-in.net"

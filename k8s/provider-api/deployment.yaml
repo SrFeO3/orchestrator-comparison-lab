@@ -23,7 +23,7 @@ spec:
 
       containers:
       - name: spn-api
-        image: ghcr.io/srfeo3/spn-api:latest
+        image: ghcr.io/srfeo3/fruitshop-api:latest
         env:
         - name: API_HOST
           value: "0.0.0.0"
@@ -40,7 +40,7 @@ spec:
             memory: 256Mi
 
       - name: spn-provider
-        image: ghcr.io/srfeo3/spnagent/provider:latest
+        image: ghcr.io/chip-in-v2/spnagent/provider:latest
         env:
         - name: SPN_HUB_HOSTNAME
           value: "hub1.test.v2.chip-in.net"

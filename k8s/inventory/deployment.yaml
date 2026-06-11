@@ -34,7 +34,7 @@ spec:
 
       # --- Task: inventory (API & Web UI) ---
       - name: inventory
-        image: ghcr.io/srfeo3/chip-in-inventory:latest
+        image: ghcr.io/chip-in-v2/chip-in-inventory:latest
         env:
           - name: ETCD_ENDPOINTS
             value: "http://127.0.0.1:2379"

@@ -27,7 +27,7 @@ spec:
         - "hub1.test.v2.chip-in.net"
       containers:
       - name: spngw
-        image: ghcr.io/srfeo3/spngw:latest
+        image: ghcr.io/chip-in-v2/spngw:latest
         ports:
         - name: gw-http
           containerPort: 7080
@@ -51,7 +51,7 @@ spec:
           mountPath: /app/conf/pinconfig.yaml
           subPath: pinconfig.yaml
       - name: multi-consumer
-        image: ghcr.io/srfeo3/spnagent/multi-consumer:latest
+        image: ghcr.io/chip-in-v2/spnagent/multi-consumer:latest
         env:
         - name: SPN_HUB_HOSTNAME
           value: "hub1.test.v2.chip-in.net"

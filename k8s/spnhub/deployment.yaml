@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: spnhub
-        image: ghcr.io/srfeo3/spnhub:latest
+        image: ghcr.io/chip-in-v2/spnhub:latest
         ports:
         - name: hub-udp
           containerPort: 4433

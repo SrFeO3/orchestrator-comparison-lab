@@ -23,14 +23,14 @@ spec:
 
       containers:
       - name: spn-auth
-        image: ghcr.io/srfeo3/spn-auth:latest
+        image: ghcr.io/srfeo3/rudoidc:latest
         resources:
           limits:
             cpu: 100m
             memory: 128Mi
 
       - name: spn-provider
-        image: ghcr.io/srfeo3/spnagent/provider:latest
+        image: ghcr.io/chip-in-v2/spnagent/provider:latest
         env:
         - name: SPN_HUB_HOSTNAME
           value: "hub1.test.v2.chip-in.net"
