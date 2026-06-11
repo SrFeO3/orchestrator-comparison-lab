@@ -58,8 +58,7 @@ spec:
             containerPort: 7080
         volumeMounts:
           - name: config-file
-            mountPath: /etc/inventory/config.yaml
-            subPath: config.yaml
+            mountPath: /etc/inventory
 
       volumes:
         - name: etcd-data
