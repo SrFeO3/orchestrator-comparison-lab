@@ -44,12 +44,18 @@ spec:
           value: "443"
         - name: APIGW_PINGORA_CONF
           value: "/app/conf/pinconfig.yaml"
+        - name: APIGW_REDIS_URL
+          value: "redis://127.0.0.1:6379"
         - name: RUST_LOG
           value: "info"
         volumeMounts:
         - name: gw-config
           mountPath: /app/conf/pinconfig.yaml
           subPath: pinconfig.yaml
+      - name: redis
+        image: redis:alpine
+        ports:
+        - containerPort: 6379
       - name: multi-consumer
         image: ghcr.io/chip-in-v2/spnagent/multi-consumer:latest
         env:
