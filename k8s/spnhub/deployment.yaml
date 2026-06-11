@@ -27,7 +27,7 @@ spec:
         - name: SPNHUB_INVENTORY_URL
           value: "http://spn-inventory-service:3000/v1"
         - name: RUST_LOG
-          value: "info"
+          value: "info,rustls=debug"
 ---
 apiVersion: v1
 kind: Service
