@@ -26,6 +26,9 @@ spec:
       - name: spnagent-trustca
         configMap:
           name: spnagent-trustca-config
+      - name: reqwest-trustca
+        configMap:
+          name: reqwest-trustca-config
 
       containers:
       - name: spn-api
@@ -55,10 +58,16 @@ spec:
             secretKeyRef:
               name: provider-api-db-secret
               key: CORS_ALLOWED_ORIGINS
+        - name: TRUST_CERTIFICATE_ROOT
+          value: "/etc/ssl/certs/cacert.pem"
         resources:
           limits:
             cpu: 100m
             memory: 256Mi
+        volumeMounts:
+        - name: reqwest-trustca
+          mountPath: /etc/ssl/certs/cacert.pem
+          subPath: cacert.pem
 
       - name: spn-provider
         image: ghcr.io/chip-in-v2/spnagent/provider:latest
