@@ -46,6 +46,18 @@ spec:
           value: "/app/conf/pinconfig.yaml"
         - name: APIGW_REDIS_URL
           value: "redis://127.0.0.1:6379"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: gw-http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: gw-http
+          initialDelaySeconds: 5
+          periodSeconds: 10
         - name: RUST_LOG
           value: "info"
         volumeMounts:
