@@ -48,18 +48,18 @@ spec:
           value: "redis://127.0.0.1:6379"
         - name: RUST_LOG
           value: "info"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: gw-http
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: gw-http
-          initialDelaySeconds: 5
-          periodSeconds: 10
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: gw-http
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: gw-http
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
         volumeMounts:
         - name: gw-config
           mountPath: /app/conf/pinconfig.yaml
