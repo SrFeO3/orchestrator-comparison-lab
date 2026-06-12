@@ -31,8 +31,8 @@ spec:
           value: "7444"
         - name: DATABASE_URL
           valueFrom:
-            configMapKeyRef:
-              name: provider-api-config
+            secretKeyRef:
+              name: provider-api-db-secret
               key: DATABASE_URL
         resources:
           limits:
@@ -56,6 +56,40 @@ spec:
           value: "/etc/ssl/workers/client-certs/client-key.pem"
         - name: RUST_LOG
           value: "info"
+
+      - name: spn-db-consumer
+        image: ghcr.io/chip-in-v2/spnagent/consumer:latest
+        env:
+        - name: SPN_HUB_HOSTNAME
+          value: "hub1.test.v2.chip-in.net"
+        - name: SPN_HUB_PORT
+          value: "4433"
+        - name: LISTEN_ADDRESS
+          value: "127.0.0.1:5432"
+        - name: SPN_AGENT_TRUST_CERTIFICATE_ROOT
+          value: "/etc/ssl/workers/ca-certificates/ca.pem"
+        - name: SPN_AGENT_CLIENT_CERTIFICATE
+          value: "/etc/ssl/workers/client-certs/client.pem"
+        - name: SPN_AGENT_CLIENT_CERTIFICATE_KEY
+          value: "/etc/ssl/workers/client-certs/client-key.pem"
+        - name: RUST_LOG
+          value: "info"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - name: certs
+          mountPath: /etc/ssl/workers/ca-certificates/ca.pem
+          subPath: ca.pem
+        - name: certs
+          mountPath: /etc/ssl/workers/client-certs/client.pem
+          subPath: client.pem
+        - name: certs
+          mountPath: /etc/ssl/workers/client-certs/client-key.pem
+          subPath: client-key.pem
+          readOnly: true
+
         volumeMounts:
         - name: certs
           mountPath: /etc/ssl/workers/ca-certificates/ca.pem
