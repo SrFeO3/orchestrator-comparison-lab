@@ -23,6 +23,9 @@ spec:
       - name: consumer-certs
         secret:
           secretName: consumer-db-certs
+      - name: spnagent-trustca
+        configMap:
+          name: spnagent-trustca-config
 
       containers:
       - name: spn-api
@@ -75,7 +78,7 @@ spec:
         - name: RUST_LOG
           value: "info"
         volumeMounts:
-        - name: provider-certs
+        - name: spnagent-trustca
           mountPath: /etc/ssl/workers/ca-certificates/ca.pem
           subPath: ca.pem
         - name: provider-certs
@@ -108,7 +111,7 @@ spec:
             cpu: 100m
             memory: 128Mi
         volumeMounts:
-        - name: consumer-certs
+        - name: spnagent-trustca
           mountPath: /etc/ssl/workers/ca-certificates/ca.pem
           subPath: ca.pem
         - name: consumer-certs

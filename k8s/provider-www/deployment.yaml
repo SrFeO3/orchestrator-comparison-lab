@@ -20,6 +20,9 @@ spec:
       - name: certs
         secret:
           secretName: provider-www-certs
+      - name: spnagent-trustca
+        configMap:
+          name: spnagent-trustca-config
 
       containers:
       - name: spn-www
@@ -52,7 +55,7 @@ spec:
         - name: RUST_LOG
           value: "info"
         volumeMounts:
-        - name: certs
+        - name: spnagent-trustca
           mountPath: /etc/ssl/workers/ca-certificates/ca.pem
           subPath: ca.pem
         - name: certs

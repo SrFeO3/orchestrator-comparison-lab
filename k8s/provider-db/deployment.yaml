@@ -23,6 +23,9 @@ spec:
       - name: db-init
         configMap:
           name: provider-db-init-config
+      - name: spnagent-trustca
+        configMap:
+          name: spnagent-trustca-config
 
       containers:
       - name: postgres
@@ -59,7 +62,7 @@ spec:
         - name: RUST_LOG
           value: "info"
         volumeMounts:
-        - name: certs
+        - name: spnagent-trustca
           mountPath: /etc/ssl/workers/ca-certificates/ca.pem
           subPath: ca.pem
         - name: certs

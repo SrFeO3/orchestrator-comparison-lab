@@ -93,7 +93,7 @@ spec:
           name: spngw-consumer-supervisor-config
       - name: worker-ca
         configMap:
-          name: spngw-consumer-trustca-config
+          name: spnagent-trustca-config
       - name: worker-certs
         secret:
           secretName: spngw-consumer-certs
