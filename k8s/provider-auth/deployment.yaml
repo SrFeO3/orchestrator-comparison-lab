@@ -36,7 +36,7 @@ spec:
             memory: 128Mi
         volumeMounts:
         - name: auth-config
-          mountPath: /app/conf/config.yaml
+          mountPath: /conf/config.yaml
           subPath: config.yaml
 
       - name: spn-provider
