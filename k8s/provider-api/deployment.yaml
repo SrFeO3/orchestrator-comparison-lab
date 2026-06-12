@@ -37,6 +37,21 @@ spec:
             secretKeyRef:
               name: provider-api-db-secret
               key: DATABASE_URL
+        - name: OIDC_ISSUER_URL_INTERNAL
+          valueFrom:
+            secretKeyRef:
+              name: provider-api-db-secret
+              key: OIDC_ISSUER_URL_INTERNAL
+        - name: OIDC_ISSUER_URL_EXTERNAL
+          valueFrom:
+            secretKeyRef:
+              name: provider-api-db-secret
+              key: OIDC_ISSUER_URL_EXTERNAL
+        - name: CORS_ALLOWED_ORIGINS
+          valueFrom:
+            secretKeyRef:
+              name: provider-api-db-secret
+              key: CORS_ALLOWED_ORIGINS
         resources:
           limits:
             cpu: 100m
