@@ -23,6 +23,9 @@ spec:
       - name: spnagent-trustca
         configMap:
           name: spnagent-trustca-config
+      - name: auth-config
+        secret:
+          secretName: provider-auth-secret
 
       containers:
       - name: spn-auth
@@ -31,6 +34,10 @@ spec:
           limits:
             cpu: 100m
             memory: 128Mi
+        volumeMounts:
+        - name: auth-config
+          mountPath: /app/conf/config.yaml
+          subPath: config.yaml
 
       - name: spn-provider
         image: ghcr.io/chip-in-v2/spnagent/provider:latest
