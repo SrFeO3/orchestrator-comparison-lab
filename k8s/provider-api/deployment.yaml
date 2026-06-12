@@ -17,9 +17,12 @@ spec:
         hostnames:
         - "hub1.test.v2.chip-in.net"
       volumes:
-      - name: certs
+      - name: provider-certs
         secret:
           secretName: provider-api-certs
+      - name: consumer-certs
+        secret:
+          secretName: consumer-db-certs
 
       containers:
       - name: spn-api
@@ -56,6 +59,17 @@ spec:
           value: "/etc/ssl/workers/client-certs/client-key.pem"
         - name: RUST_LOG
           value: "info"
+        volumeMounts:
+        - name: provider-certs
+          mountPath: /etc/ssl/workers/ca-certificates/ca.pem
+          subPath: ca.pem
+        - name: provider-certs
+          mountPath: /etc/ssl/workers/client-certs/client.pem
+          subPath: client.pem
+        - name: provider-certs
+          mountPath: /etc/ssl/workers/client-certs/client-key.pem
+          subPath: client-key.pem
+          readOnly: true
 
       - name: spn-db-consumer
         image: ghcr.io/chip-in-v2/spnagent/consumer:latest
@@ -79,25 +93,13 @@ spec:
             cpu: 100m
             memory: 128Mi
         volumeMounts:
-        - name: certs
+        - name: consumer-certs
           mountPath: /etc/ssl/workers/ca-certificates/ca.pem
           subPath: ca.pem
-        - name: certs
+        - name: consumer-certs
           mountPath: /etc/ssl/workers/client-certs/client.pem
           subPath: client.pem
-        - name: certs
-          mountPath: /etc/ssl/workers/client-certs/client-key.pem
-          subPath: client-key.pem
-          readOnly: true
-
-        volumeMounts:
-        - name: certs
-          mountPath: /etc/ssl/workers/ca-certificates/ca.pem
-          subPath: ca.pem
-        - name: certs
-          mountPath: /etc/ssl/workers/client-certs/client.pem
-          subPath: client.pem
-        - name: certs
+        - name: consumer-certs
           mountPath: /etc/ssl/workers/client-certs/client-key.pem
           subPath: client-key.pem
           readOnly: true
