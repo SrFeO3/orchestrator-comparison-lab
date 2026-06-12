@@ -6,7 +6,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`www.test.v2.chip-in.net`)
+  - match: Host(`www.test.v2.chip-in.net`) || Host(`auth.test.v2.chip-in.net`) || Host(`check.test.v2.chip-in.net`) || Host(`api.test.v2.chip-in.net`) || Host(`sirius.test.v2.chip-in.net`)
     kind: Rule
     services:
     - name: spn-gw-service
@@ -20,7 +20,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: HostSNI(`www.test.v2.chip-in.net`)
+  - match: HostSNI(`www.test.v2.chip-in.net`) || HostSNI(`auth.test.v2.chip-in.net`) || HostSNI(`check.test.v2.chip-in.net`) || HostSNI(`api.test.v2.chip-in.net`) || HostSNI(`sirius.test.v2.chip-in.net`)
     services:
     - name: spn-gw-service
       port: 443
