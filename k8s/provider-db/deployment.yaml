@@ -20,6 +20,9 @@ spec:
       - name: certs
         secret:
           secretName: provider-db-certs
+      - name: db-init
+        configMap:
+          name: provider-db-init-config
 
       containers:
       - name: postgres
@@ -27,13 +30,16 @@ spec:
         env:
         - name: POSTGRES_PASSWORD
           valueFrom:
-            configMapKeyRef:
-              name: provider-db-config
+            secretKeyRef:
+              name: provider-db-secret
               key: POSTGRES_PASSWORD
         resources:
           limits:
             cpu: 200m
             memory: 512Mi
+        volumeMounts:
+        - name: db-init
+          mountPath: /docker-entrypoint-initdb.d/
 
       - name: spn-provider
         image: ghcr.io/chip-in-v2/spnagent/provider:latest
